@@ -3,6 +3,7 @@
     ["transform-react-jsx", {
       "pragma": "e"
     },
-    "es2015"]
+  "es2015"
+],
   ]
 }
