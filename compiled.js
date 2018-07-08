@@ -5,55 +5,131 @@ const UPDATE = 'UPDATE';
 const SET_PROP = 'SET_PROP';
 const REMOVE_PROP = 'REMOVE_PROP';
 
-// Diff
-function changed(node1, node2) {
-  const strCheck = typeof node1 === 'string' && node1 !== node2;
-  const nodeCheck = typeof node1 !== typeof node2;
-  const typeCheck = node1.type !== node2.type;
-  return typeCheck || strCheck || nodeCheck;
+// Application
+
+const flatten = arr => [].concat.apply([], arr);
+const range = size => [...Array(size).keys()];
+
+function e(type, props, ...children) {
+  props = props || {};
+  return { type, props, children: flatten(children) };
 }
 
-function diffProps(newNode, oldNode) {
-  const patches = [];
-  const props = Object.assign({}, newNode.props, oldNode.props);
-  Object.keys(props).forEach(name => {
-    const newVal = newNode.props[name];
-    const oldVal = oldNode.props[name];
-    if (!newVal) {
-      patches.push({ type: REMOVE_PROP, name, value: oldVal });
-    }
-    if (!oldVal || newVal !== oldVal) {
-      patches.push({ type: SET_PROP, name, value: newVal });
-    }
-  });
-  return patches;
+class App extends Component {
+  render() {
+    // @
+    const count = this.state.count || 0;
+
+    // Smart range function...
+    const r = range(count);
+
+    const list = r.map(n => e(
+      'li',
+      null,
+      (count * n).toString()
+    ));
+    return e(
+      'ul',
+      { id: 'mylist', className: `color-${count % 3}` },
+      e('button', { onClick: () => this.setState({ count: count + 1 }) }),
+      list
+    );
+  }
+}
+class List extends Component {
+  render() {
+    // @
+    const count = this.state.count || 0;
+
+    // Smart range function...
+    const r = range(count);
+
+    const list = r.map(n => e(
+      'li',
+      null,
+      (count * n).toString()
+    ));
+    return e(
+      'ul',
+      { id: 'mylist', className: `color-${count % 3}` },
+      e(
+        'button',
+        { onClick: () => this.setState({ count: count + 1 }) },
+        'Btn'
+      ),
+      list
+    );
+  }
 }
 
-function diffChildren(newNode, oldNode) {
-  const patches = [];
-  const patchesLength = Math.max(newNode.children.length, oldNode.children.length);
-  for (let i = 0; i < patchesLength; i++) {
-    patches[i] = diff(newNode.children[i], oldNode.children[i]);
-  }
-  return patches;
+function view(count) {
+  // @
+  // Smart range function...
+  const r = [...Array(count).keys()];
+  const list = r.map(n => e(
+    'li',
+    null,
+    (count * n).toString()
+  ));
+  return e(
+    'ul',
+    { id: 'mylist', className: `color-${count % 3}` },
+    e(
+      'button',
+      { click: () => update(app, count + 1) },
+      'Click'
+    ),
+    list
+  );
 }
 
-function diff(newNode, oldNode) {
-  if (!oldNode) {
-    return { type: CREATE, newNode };
+function update(element, count) {
+  const patches = diff(view(count + 1), view(count));
+  console.log('Nbr of patches: ' + patches.length);
+
+  patch(element, patches);
+
+  console.log(count, patches);
+  if (count > 20) return;
+}
+
+let app;
+function render(el) {
+  // @
+  app = el;
+  app.appendChild(createElement(view(0)));
+  // app.append(<List count={5} />)
+}
+
+// Component
+
+class Component {
+  constructor(type, props, ...children) {
+    this.props = props || {};
+    this.state = {};
+
+    this.setState = this.setState.bind(this);
+    this.update = this.update.bind(this);
+
+    this.type = type;
+    this.children = flatten(children);
+    return { type, props, children: flatten(children) };
   }
-  if (!newNode) {
-    return { type: REMOVE };
+
+  setState(newState) {
+    const newView = this.render(this.state);
+    const oldView = this.render(newState);
+    update(oldView, newView);
+    createElement(this.render());
   }
-  if (changed(newNode, oldNode)) {
-    return { type: REPLACE, newNode };
+
+  render() {
+    return null;
   }
-  if (newNode.type) {
-    return {
-      type: UPDATE,
-      props: diffProps(newNode, oldNode),
-      children: diffChildren(newNode, oldNode)
-    };
+
+  update(oldElement, newElement) {
+    const patches = diff(newElement, oldElement);
+    patch(oldElement, patches);
   }
 }
 
@@ -72,6 +148,9 @@ function createElement(node) {
 function setProp(target, name, value) {
   if (name === 'className') {
     return target.setAttribute('class', value);
+  }
+  if (typeof value === 'function') {
+    return target.addEventListener(name, value);
   }
   target.setAttribute(name, value);
 }
@@ -138,101 +217,54 @@ function patch(root, patches, index = 0) {
   }
 }
 
-// Component
-
-class Component {
-  constructor(type, props, ...children) {
-    this.props = props || {};
-    this.state = {};
-
-    this.setState = this.setState.bind(this);
-    this.update = this.update.bind(this);
-
-    this.type = type;
-    this.children = flatten(children);
-    return { type, props, children: flatten(children) };
-  }
-
-  setState(newState) {
-    const newView = this.render(this.state);
-    const oldView = this.render(newState);
-    update(oldView, newView);
-    createElement(this.render());
-  }
-
-  render() {
-    return null;
-  }
-
-  update(oldElement, newElement) {
-    const patches = diff(newElement, oldElement);
-    patch(oldElement, patches);
-  }
+// Diff
+function changed(node1, node2) {
+  const strCheck = typeof node1 === 'string' && node1 !== node2;
+  const nodeCheck = typeof node1 !== typeof node2;
+  const typeCheck = node1.type !== node2.type;
+  return typeCheck || strCheck || nodeCheck;
 }
 
-// Application
-
-const flatten = arr => [].concat.apply([], arr);
-const range = size => [...Array(size).keys()];
-
-function e(type, props, ...children) {
-  props = props || {};
-  return { type, props, children: flatten(children) };
+function diffProps(newNode, oldNode) {
+  const patches = [];
+  const props = Object.assign({}, newNode.props, oldNode.props);
+  Object.keys(props).forEach(name => {
+    const newVal = newNode.props[name];
+    const oldVal = oldNode.props[name];
+    if (!newVal) {
+      patches.push({ type: REMOVE_PROP, name, value: oldVal });
+    }
+    if (!oldVal || newVal !== oldVal) {
+      patches.push({ type: SET_PROP, name, value: newVal });
+    }
+  });
+  return patches;
 }
 
-class List extends Component {
-  render() {
-    // @
-    const count = this.state.count || 0;
-
-    // Smart range function...
-    const r = range(count);
-
-    const list = r.map(n => e(
-      'li',
-      null,
-      (count * n).toString()
-    ));
-    return e(
-      'ul',
-      { id: 'mylist', className: `color-${count % 3}` },
-      e('button', { onClick: () => this.setState({ count: count + 1 }) }),
-      list
-    );
+function diffChildren(newNode, oldNode) {
+  const patches = [];
+  const patchesLength = Math.max(newNode.children.length, oldNode.children.length);
+  for (let i = 0; i < patchesLength; i++) {
+    patches[i] = diff(newNode.children[i], oldNode.children[i]);
   }
+  return patches;
 }
 
-function view(count) {
-  // @
-  // Smart range function...
-  const r = [...Array(count).keys()];
-  const list = r.map(n => e(
-    'li',
-    null,
-    (count * n).toString()
-  ));
-  return e(
-    'ul',
-    { id: 'mylist', className: `color-${count % 3}` },
-    e('button', { onClick: () => update(count + 1) }),
-    list
-  );
-}
-
-function update(element, count) {
-  const patches = diff(view(count + 1), view(count));
-  console.log('Nbr of patches: ' + patches.length);
-
-  patch(element, patches);
-
-  console.log(count, patches);
-  if (count > 20) return;
-
-  setTimeout(() => update(element, count + 1), 1000);
-}
-
-function render(app) {
-  // @
-  app.appendChild(createElement(view(0)));
-  // app.append(<List count={5} />)
+function diff(newNode, oldNode) {
+  if (!oldNode) {
+    return { type: CREATE, newNode };
+  }
+  if (!newNode) {
+    return { type: REMOVE };
+  }
+  if (changed(newNode, oldNode)) {
+    return { type: REPLACE, newNode };
+  }
+  if (newNode.type) {
+    return {
+      type: UPDATE,
+      props: diffProps(newNode, oldNode),
+      children: diffChildren(newNode, oldNode)
+    };
+  }
 }
