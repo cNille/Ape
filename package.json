@@ -4,7 +4,7 @@
   "description": "Selfwritten web-app-renderer",
   "main": "nucleus.js",
   "scripts": {
-    "compile": "babel nucleus/index.js --out-file compiled.js",
+    "compile": "nodemon --exec babel nucleus/index.js --out-file compiled.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "cNille",
