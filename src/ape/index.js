@@ -18,13 +18,9 @@ const StateTree = {
 export class Ape {
   constructor (rootId, app) {
     this.root = document.getElementById(rootId)
-    this.app = app
     setProp(this.root, 'root')
-    this.render = this.render.bind(this)
-    this.root.appendChild(createElement(this.render()))
-  }
-  render () {
-    return this.app
+    this.app = app
+    this.root.appendChild(createElement(this.app))
   }
 }
 
