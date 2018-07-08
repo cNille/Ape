@@ -1,12 +1,10 @@
-# Nucleus
+# Ape
 
 Building a own version of a React, for educational purpose. 
 
-
-
-Writing your own framework is the smallest framework you could use, right? 
-Therefore the name Nucleus, minimalistic framework! Wohoo!
-
+Writing your own framework is a little like taking a step back. With aim to
+go back to the roots, right? 
+Therefore the name Ape, one step back in evolution! Wohoo!
 
 # Cred
 

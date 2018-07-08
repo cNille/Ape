@@ -15,7 +15,7 @@ import {
 // Application
 const StateTree = {
 }
-export class Nucleus {
+export class Ape {
   constructor (rootId, app) {
     this.root = document.getElementById(rootId)
     this.app = app

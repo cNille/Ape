@@ -1,6 +1,6 @@
-import { Component, Nucleus } from './nucleus/index'
-import { e, range } from './nucleus/util'
-import { setProp, createElement } from './nucleus/patch'
+import { Component, Ape } from './ape/index'
+import { e, range } from './ape/util'
+import { setProp, createElement } from './ape/patch'
 
 export default class App extends Component {
   constructor (type, props, ...children) {
@@ -21,6 +21,7 @@ class Container extends Component {
     this.update = this.update.bind(this)
     return this
   }
+
   update (count) {
     this.setState({ count })
   }
@@ -29,6 +30,7 @@ class Container extends Component {
     return (
       <section>
         <button click={() => this.update(count + 1)} >Click</button>
+        { count % 2 == 0 ? 'Is even' : 'Is odd' }
         <List count={count} />
       </section>
     )
@@ -48,4 +50,4 @@ class List extends Component {
 }
 
 var main = document.getElementById('main')
-var application = new Nucleus('main', <App />)
+var application = new Ape('main', <App />)
