@@ -31,7 +31,7 @@ export function createElement (node, id = '1') {
   }
 }
 
-export function setProp (target, name, value) {
+function setProp (target, name, value) {
   if (name === 'className') {
     return target.setAttribute('class', value)
   }

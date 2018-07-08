@@ -1,6 +1,6 @@
 import { diff } from './diff'
-import { flatten, range, isComponent, e } from './util'
-import { setProp, createElement, patch } from './patch'
+import { flatten, e } from './util'
+import { createElement, patch } from './patch'
 
 // Types
 import {
@@ -18,7 +18,7 @@ const StateTree = {
 export class Ape {
   constructor (rootId, app) {
     this.root = document.getElementById(rootId)
-    setProp(this.root, 'root')
+    this.root.setAttribute('root', true)
     this.app = app
     this.root.appendChild(createElement(this.app))
   }
