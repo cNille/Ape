@@ -4,6 +4,7 @@ import {
   REMOVE,
   REPLACE,
   UPDATE,
+  EMPTY,
   SET_PROP,
   REMOVE_PROP
 } from './constants'
@@ -44,7 +45,7 @@ function diffChildren (newNode, oldNode, parentId) {
     const newChild = newNode.children[i]
     const oldChild = oldNode.children[i]
 
-    if (isComponent(newChild) && isComponent(oldChild)) {
+    if (newChild && oldChild && isComponent(newChild) && isComponent(oldChild)) {
       // If components
       newChild.props.id = parentId + '.' + i
       oldChild.props.id = parentId + '.' + i
@@ -79,10 +80,18 @@ export function diff (newNode, oldNode, parentId) {
     return { type: REPLACE, newNode }
   }
   if (newNode.type) {
-    return {
-      type: UPDATE,
-      props: diffProps(newNode, oldNode),
-      children: diffChildren(newNode, oldNode, parentId)
+    const props = diffProps(newNode, oldNode)
+    const children = diffChildren(newNode, oldNode, parentId)
+    if (children.length || props.length) {
+      return {
+        type: UPDATE,
+        props,
+        children
+      }
+    } else {
+      return {
+        type: EMPTY
+      }
     }
   }
 }

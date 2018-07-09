@@ -16,33 +16,37 @@ class Container extends Component {
     super(type, props, ...children)
 
     this.state = {
-      count: 10
+      list: ['Item-0']
     }
-    this.update = this.update.bind(this)
+    this.addTodo = this.addTodo.bind(this)
     return this
   }
 
-  update (count) {
-    this.setState({ count })
+  addTodo (item) {
+    const newList = [...this.state.list, item]
+    this.setState({ list: newList })
   }
-  render () { // @
-    const { count } = this.state
+  removeLast () {
+    const newList = this.state.list.slice(0, -1)
+    this.setState({ list: newList })
+  }
+
+  render () {
+    const { list } = this.state
     return (
       <section>
-        <button click={() => this.update(count + 1)} >Click</button>
-        { count % 2 == 0 ? 'Is even' : 'Is odd' }
-        <List count={count} />
+        <button click={() => this.addTodo(`Item-${list.length}`)} >Click</button>
+        <List list={list} />
+        <button click={() => this.removeLast()} >RemoveLast</button>
       </section>
     )
   }
 }
 class List extends Component {
   render () { // @
-    const { count } = this.props
-    const r = range(count)
-    const list = r.map(n => <li>{ (count).toString() }</li>)
+    const list = this.props.list.map(item => <li>{ item }</li>)
     return (
-      <ul className={`color-${count % 3}`}>
+      <ul>
         { list }
       </ul>
     )

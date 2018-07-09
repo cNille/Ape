@@ -45,7 +45,6 @@ export class Component {
   }
 
   setState (newState) {
-    // const oldState = this.state
     const oldElement = this.render()
     this.state = newState
     const newElement = this.render()

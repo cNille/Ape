@@ -4,9 +4,36 @@ import {
   REMOVE,
   REPLACE,
   UPDATE,
+  EMPTY,
   SET_PROP,
   REMOVE_PROP
 } from './constants'
+
+// Handle eventlisteners
+var _eventHandlers = {} // somewhere global
+
+function addListener (node, event, handler, capture) {
+  if (!(node in _eventHandlers)) {
+    _eventHandlers[node] = {}
+  }
+  if (!(event in _eventHandlers[node])) {
+    _eventHandlers[node][event] = []
+  }
+  _eventHandlers[node][event].push([handler, capture])
+  node.addEventListener(event, handler, capture)
+}
+function removeAllListeners (node, event) {
+  if (node in _eventHandlers) {
+    const handlers = _eventHandlers[node]
+    if (event in handlers) {
+      const eventHandlers = handlers[event]
+      for (let i = eventHandlers.length; i--;) {
+        const handler = eventHandlers[i]
+        node.removeEventListener(event, handler[0], handler[1])
+      }
+    }
+  }
+}
 
 // Patch
 export function createElement (node, id = '1') {
@@ -36,7 +63,8 @@ function setProp (target, name, value) {
     return target.setAttribute('class', value)
   }
   if (typeof value === 'function') {
-    return target.addEventListener(name, value)
+    removeAllListeners(target, name)
+    return addListener(target, name, value)
   }
   return target.setAttribute(name, value)
 }
@@ -70,8 +98,6 @@ function patchProps (element, patches) {
 export function patch (parent, patches, index = 0) {
   if (!patches) return
 
-  // if (!element && patches.type === UPDATE) {
-  // }
   if (!parent) {
     console.log('no parent')
   }
@@ -79,8 +105,13 @@ export function patch (parent, patches, index = 0) {
   if (!element) {
     console.log('no element')
   }
-  console.log(patches.type, element)
+  if (patches.type !== EMPTY) {
+    console.log(patches.type, element)
+  }
   switch (patches.type) {
+    case EMPTY: {
+      return
+    }
     case CREATE: {
       const {newNode} = patches
       const newElement = createElement(newNode, parent.id + '.' + index)
