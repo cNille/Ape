@@ -1,7 +1,7 @@
 {
   "plugins": [
     ["transform-react-jsx", {
-      "pragma": "e"
+      "pragma": "Ape.element"
     },
   "es2015"
 ],

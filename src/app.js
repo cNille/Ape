@@ -1,5 +1,5 @@
 import { Component, Ape } from './ape/index'
-import { e, range } from './ape/util'
+import { range } from './ape/util'
 import { setProp, createElement } from './ape/patch'
 
 export default class App extends Component {

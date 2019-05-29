@@ -1,5 +1,5 @@
 import { diff } from './diff'
-import { flatten, e } from './util'
+import { flatten } from './util'
 import { createElement, patch, runDidMount } from './patch'
 
 // Types
@@ -26,6 +26,15 @@ export class Ape {
     // Run all "component.componentDidMount" callbacks
     // produced in creating the element.
     runDidMount()
+  }
+
+  static element(type, props, ...children){
+    props = props || {}
+    return {
+      children: flatten(children),
+      type,
+      props
+    }
   }
 }
 
