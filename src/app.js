@@ -22,6 +22,14 @@ class Container extends Component {
     return this
   }
 
+  componentWillMount () {
+    console.log("Container will mount")
+  }
+
+  componentDidMount () {
+    console.log("Container mounted")
+  }
+
   addTodo (item) {
     const newList = [...this.state.list, item]
     this.setState({ list: newList })
@@ -38,13 +46,24 @@ class Container extends Component {
         <button click={() => this.addTodo(`Item-${list.length}`)} >Click</button>
         <List list={list} />
         <button click={() => this.removeLast()} >RemoveLast</button>
+        <List list={['123', 'aoeu' ]} />
       </section>
     )
   }
 }
+
+class Item extends Component {
+  render() {
+    const { value } = this.props;
+    return (
+      <li>{ value }</li>
+    );
+  }
+}
+
 class List extends Component {
   render () { // @
-    const list = this.props.list.map(item => <li>{ item }</li>)
+    const list = this.props.list.map(item => <Item value={item} />)
     return (
       <ul>
         { list }

@@ -9,6 +9,9 @@ import {
   REMOVE_PROP
 } from './constants'
 
+// An array keeping track of all component.componentDidMount callbacks.
+const componentDidMountCallbacks = []
+
 // Handle eventlisteners
 var _eventHandlers = {} // somewhere global
 
@@ -42,6 +45,13 @@ export function createElement (node, id = '1') {
   if (isComponent) {
     node.props.id = id
     const component = new node.type(node.type, node.props, node.children)
+
+    // Register componentDidMount life-cycle method
+    componentDidMountCallbacks.push(component.componentDidMount);
+
+    // Run componentWillMount life-cycle method.
+    component.componentWillMount()
+
     return createElement(component.render(), id)
   } else if (typeof node === 'string') {
     return document.createTextNode(node)
@@ -95,6 +105,13 @@ function patchProps (element, patches) {
   }
 }
 
+// Iterate all componentDidMount callbacks from end of array.
+export function runDidMount(){
+  while(componentDidMountCallbacks.length > 0){
+    componentDidMountCallbacks.pop()()
+  }
+}
+
 export function patch (parent, patches, index = 0) {
   if (!patches) return
 
@@ -115,7 +132,12 @@ export function patch (parent, patches, index = 0) {
     case CREATE: {
       const {newNode} = patches
       const newElement = createElement(newNode, parent.id + '.' + index)
-      return parent.append(newElement)
+
+      const mountedNode = parent.append(newElement)
+
+      runDidMount()
+
+      return mountedNode
     }
     case REMOVE: {
       return parent.removeChild(element)

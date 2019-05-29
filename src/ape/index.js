@@ -1,6 +1,6 @@
 import { diff } from './diff'
 import { flatten, e } from './util'
-import { createElement, patch } from './patch'
+import { createElement, patch, runDidMount } from './patch'
 
 // Types
 import {
@@ -20,7 +20,12 @@ export class Ape {
     this.root = document.getElementById(rootId)
     this.root.setAttribute('root', true)
     this.app = app
+
     this.root.appendChild(createElement(this.app))
+
+    // Run all "component.componentDidMount" callbacks
+    // produced in creating the element.
+    runDidMount()
   }
 }
 
@@ -30,6 +35,8 @@ export class Component {
     this.props = props || {}
     this.state = {}
     this.setState = this.setState.bind(this)
+    this.componentWillMount = this.componentWillMount.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
 
     this.type = type
     this.children = flatten(children)
@@ -43,6 +50,10 @@ export class Component {
     }
     return this
   }
+
+  // Skeleton functions of lifecycle methods
+  componentWillMount() { console.log("Will mount: " + this.props.id) }
+  componentDidMount() { console.log("Did mount: " + this.props.id) }
 
   setState (newState) {
     const oldElement = this.render()
