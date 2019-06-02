@@ -1,76 +1,71 @@
-import { Component, Ape } from './ape/index'
-import { range } from './ape/util'
-import { setProp, createElement } from './ape/patch'
+import { Component, Ape } from "./ape/index";
+import { range } from "./ape/util";
+import { setProp, createElement } from "./ape/patch";
 
 export default class App extends Component {
-  constructor (type, props, ...children) {
-    super(type, props, ...children)
+  constructor(type, props, ...children) {
+    super(type, props, ...children);
   }
-  render () {
-    return <Container />
+  render() {
+    return <Container />;
   }
 }
 
 class Container extends Component {
-  constructor (type, props, ...children) {
-    super(type, props, ...children)
+  constructor(type, props, ...children) {
+    super(type, props, ...children);
 
     this.state = {
-      list: ['Item-0']
-    }
-    this.addTodo = this.addTodo.bind(this)
-    return this
+      list: ["Item-0"]
+    };
+    this.addTodo = this.addTodo.bind(this);
+    return this;
   }
 
-  componentWillMount () {
-    console.log("Container will mount")
+  componentWillMount() {
+    console.log("Container will mount");
   }
 
-  componentDidMount () {
-    console.log("Container mounted")
+  componentDidMount() {
+    console.log("Container mounted");
   }
 
-  addTodo (item) {
-    const newList = [...this.state.list, item]
-    this.setState({ list: newList })
+  addTodo(item) {
+    const newList = [...this.state.list, item];
+    this.setState({ list: newList });
   }
-  removeLast () {
-    const newList = this.state.list.slice(0, -1)
-    this.setState({ list: newList })
+  removeLast() {
+    const newList = this.state.list.slice(0, -1);
+    this.setState({ list: newList });
   }
 
-  render () {
-    const { list } = this.state
+  render() {
+    const { list } = this.state;
     return (
       <section>
-        <button click={() => this.addTodo(`Item-${list.length}`)} >Click</button>
+        <button click={() => this.addTodo(`Item-${list.length}`)}>Click</button>
         <List list={list} />
-        <button click={() => this.removeLast()} >RemoveLast</button>
-        <List list={['123', 'aoeu' ]} />
+        <button click={() => this.removeLast()}>RemoveLast</button>
+        <List list={["123", "aoeu"]} />
       </section>
-    )
+    );
   }
 }
 
 class Item extends Component {
   render() {
     const { value } = this.props;
-    return (
-      <li>{ value }</li>
-    );
+    return <li>{value}</li>;
   }
 }
 
 class List extends Component {
-  render () { // @
-    const list = this.props.list.map(item => <Item value={item} />)
-    return (
-      <ul>
-        { list }
-      </ul>
-    )
+  render() {
+    // @
+    const list = this.props.list.map(item => <Item value={item} />);
+    return <ul>{list}</ul>;
   }
 }
 
-var main = document.getElementById('main')
-var application = new Ape('main', <App />)
+var main = document.getElementById("main");
+var application = new Ape("main", <App />);
