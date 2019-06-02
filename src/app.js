@@ -55,7 +55,7 @@ class Container extends Component {
 class Item extends Component {
   render() {
     const { value } = this.props;
-    return <li>{value}</li>;
+    return <li ref={r => console.log("AOEU", r)}>{value}</li>;
   }
 }
 

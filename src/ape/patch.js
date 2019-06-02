@@ -11,6 +11,7 @@ import {
 
 // An array keeping track of all component.componentDidMount callbacks.
 const componentDidMountCallbacks = [];
+const setRefCallback = [];
 
 // Handle eventlisteners
 var _eventHandlers = {}; // somewhere global
@@ -57,6 +58,12 @@ export function createElement(node, id = "1") {
     return document.createTextNode(node);
   } else {
     const element = document.createElement(node.type, id);
+
+    if (typeof node.props.ref === "function") {
+      setRefCallback.push(() => node.props.ref(document.getElementById(id)));
+      //delete node.props.ref;
+    }
+
     setProp(element, "id", id);
     setProps(element, node.props);
     node.children
@@ -69,6 +76,9 @@ export function createElement(node, id = "1") {
 }
 
 function setProp(target, name, value) {
+  if (name === "ref") {
+    return;
+  }
   if (name === "className") {
     return target.setAttribute("class", value);
   }
@@ -110,6 +120,9 @@ export function runDidMount() {
   while (componentDidMountCallbacks.length > 0) {
     componentDidMountCallbacks.pop()();
   }
+  while (setRefCallback.length > 0) {
+    setRefCallback.pop()();
+  }
 }
 
 export function patch(parent, patches, index = 0) {
@@ -145,7 +158,9 @@ export function patch(parent, patches, index = 0) {
     case REPLACE: {
       const { newNode } = patches;
       const newElement = createElement(newNode, parent.id + "." + index);
-      return parent.replaceChild(newElement, element);
+      const mountedNode = parent.replaceChild(newElement, element);
+      runDidMount();
+      return mountedNode;
     }
     case UPDATE: {
       const { props, children } = patches;
