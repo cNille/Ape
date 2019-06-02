@@ -8,6 +8,7 @@ import {
   SET_PROP,
   REMOVE_PROP
 } from "./constants";
+import { isComponent } from "./util";
 
 // An array keeping track of all component.componentDidMount callbacks.
 const componentDidMountCallbacks = [];
@@ -42,21 +43,30 @@ function removeAllListeners(node, event) {
 // Patch
 export function createElement(node, id = "1") {
   // Handle component
-  const isComponent = typeof node.type === "function";
-  if (isComponent) {
+  if (isComponent(node)) {
     node.props.id = id;
     const component = new node.type(node.type, node.props, node.children);
 
     // Register componentDidMount life-cycle method
-    componentDidMountCallbacks.push(component.componentDidMount);
+    if (typeof componentcomponentDidMount === "function") {
+      componentDidMountCallbacks.push(component.componentDidMount);
+    }
 
     // Run componentWillMount life-cycle method.
-    component.componentWillMount();
+    if (typeof component.componentWillMount === "function") {
+      component.componentWillMount();
+    }
+
+    // Handle if component is a Component class
+    if (typeof component.render !== "function") {
+      component.render = () => node.type(node.props);
+    }
 
     return createElement(component.render(), id);
-  } else if (typeof node === "string") {
-    return document.createTextNode(node);
-  } else {
+    // Handle if component is a function
+    //const rendered = node.type(node.props);
+    //return createElement(rendered, id);
+  } else if (typeof node === "object" && typeof node.type !== "undefined") {
     const element = document.createElement(node.type, id);
 
     if (typeof node.props.ref === "function") {
@@ -72,6 +82,8 @@ export function createElement(node, id = "1") {
       })
       .forEach(element.appendChild.bind(element));
     return element;
+  } else {
+    return document.createTextNode(node);
   }
 }
 

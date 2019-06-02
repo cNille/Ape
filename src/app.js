@@ -53,6 +53,7 @@ class Container extends Component {
         >
           Click
         </button>
+        <Counter count={list.length} />
         <List list={list} />
         <button
           click={() => this.removeLast()}
@@ -68,6 +69,10 @@ class Container extends Component {
       </section>
     );
   }
+}
+
+function Counter(props) {
+  return <p>You have {props.count} items</p>;
 }
 
 class Item extends Component {
