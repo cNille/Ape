@@ -79,6 +79,12 @@ function setProp(target, name, value) {
   if (name === "ref") {
     return;
   }
+  if (name === "style") {
+    Object.keys(value).forEach(key => {
+      target.style[key] = value[key];
+    });
+    return;
+  }
   if (name === "className") {
     return target.setAttribute("class", value);
   }

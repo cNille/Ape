@@ -43,9 +43,27 @@ class Container extends Component {
     const { list } = this.state;
     return (
       <section>
-        <button click={() => this.addTodo(`Item-${list.length}`)}>Click</button>
+        <button
+          click={() => this.addTodo(`Item-${list.length}`)}
+          style={{
+            backgroundColor: "#aeb",
+            padding: "10px 15px",
+            borderRadius: "15px"
+          }}
+        >
+          Click
+        </button>
         <List list={list} />
-        <button click={() => this.removeLast()}>RemoveLast</button>
+        <button
+          click={() => this.removeLast()}
+          style={{
+            backgroundColor: "#eba",
+            padding: "10px 15px",
+            borderRadius: "15px"
+          }}
+        >
+          RemoveLast
+        </button>
         <List list={["123", "aoeu"]} />
       </section>
     );
